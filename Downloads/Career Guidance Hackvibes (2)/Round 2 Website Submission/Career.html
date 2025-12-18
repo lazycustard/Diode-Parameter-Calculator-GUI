@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Path</title>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="body6">
+    <center>
+    <h1 class="myh2">
+Career Paths To choose
+
+    </h1>
+
+
+
+
+
+
+        <li><a href="https://www.cheggindia.com/career-guidance/arts-stream-jobs/"> Arts </a>
+     <li clas="VEDANT"><a href="https://www.naukri.com/blog/career-options-after-12th-science-pcm/"> PCM  </a>
+     <li class="VEDANT"><a href="https://mentormeright.in/blog/2024/05/28/what-are-the-career-options-in-pcb-bipc-stream/"> PCB </a>
+     <li class="VEDANT"><a href="https://www.cheggindia.com/career-guidance/commerce-stream/"> Commerce </a>
+        
+     </center>
+     <p class="aadhar" >
+      <center>
+        <h3 class="h3">Best options for your Stream</h3>
+       <select id="mySelect" class="op">
+  <option value="">Select your stream</option>
+  <option value="pcm">PCM</option>
+  <option value="pcb">PCB</option>
+  <option value="comm">Commerce</option>
+  <option value="arts">Arts</option>
+</select>
+
+<div id="result" class="result"></div>
+</center>
+
+
+
+
+
+
+
+
+
+     </p>
+   
+
+
+
+<script>
+document.getElementById("mySelect").addEventListener("change", function () {
+  const select = this.value;
+  const result = document.getElementById("result");
+
+  result.innerHTML = ""; 
+
+  if (select === "pcm") {
+  result.innerHTML = "<p>PCM is ideal for those who enjoy mathematics and analytical problem-solving. It leads to careers in engineering, architecture, data science, and pure sciences. PCM (Physics, Chemistry, Mathematics) and PCB (Physics, Chemistry, Biology). PCM is often chosen by students who enjoy mathematics, logical reasoning, and problem-solving, as it leads to careers in engineering, architecture, data science, and pure sciences. It also opens doors to competitive exams like JEE and NDA, which are gateways to prestigious institutes and defense services</p>";
+} 
+else if (select === "comm") {
+  result.innerHTML = "<p>Commerce is best for students interested in finance, business, and economics. Career options include Chartered Accountancy, Company Secretary, Cost Accountancy, and management roles through B.Com, BBA, or MBA. . Commerce is the stream for those inclined toward finance, business, and economics. It offers professional qualifications like Chartered Accountancy, Company Secretary, and Cost Accountancy, while also paving the way for management roles through B.Com, BBA, and MBA. Students in Commerce often pursue careers in banking, corporate law, entrepreneurship, and economics, with exams like CA and CS shaping their journey.</p>";
+}
+else if (select === "pcb") {   
+  result.innerHTML = "<p>PCB is suited for students interested in life sciences and healthcare. It opens doors to medicine, dentistry, pharmacy, biotechnology, and allied health sciences. PCB, on the other hand, is suited for students fascinated by life sciences and healthcare. It provides opportunities in medicine, dentistry, pharmacy, biotechnology, and allied health sciences, with NEET being the primary exam for medical aspirants</p>";
+}
+else if (select === "arts") {  
+  result.innerHTML = "<p>Arts or Humanities is suitable for students with creative, social, or communication-oriented interests. It offers careers in journalism, media, design, psychology, sociology, political science, and law. Arts or Humanities is chosen by students who are creative, socially aware, or interested in communication and critical thinking. It encompasses subjects like history, political science, psychology, sociology, and literature, leading to careers in journalism, media, design, law, civil services, and academia. Many Arts students prepare for UPSC or CLAT, aiming for roles in governance or law. While Science streams are more specialized and exam-driven, Commerce and Arts offer flexibility to switch into management, law, or public service</p>";
+}
+});
+    
+</script>
+<center>
+
+<button class="button9"><a href="index.html"> Home </a></button>
+</center>
+</body>
+</html>

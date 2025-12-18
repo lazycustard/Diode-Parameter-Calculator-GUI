@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>focus-session.com </title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="body7">
+  
+    <center><b class="b37">FOCUS SESSION TIMER</b></center>
+    <center>
+    <div class="timecontainer">
+      <div id="timedisplay"><b class="b">00:00:00</b></div>
+ <button id="startBtn" class="timerbtn">Start</button>
+  <button id="stopBtn" class="timerbtn">Stop</button>
+  <button id="resetBtn" class="timerbtn">Reset</button>
+    </div>
+    </center>
+    <h2 class="g10">
+      Start it when you are ready To start  Studying This stopwatch was specifically designed For you To start it when you start studying Created By Vedant And Aadhar the Developers of this website
+    </h2>
+    <b class="g10"> Check out These Websites For Notes(hover over them to see)</b>
+     <button class="Notes"><a class="notes2" href="https://www.learncbse.in/cbse-class-10-notes/"> Class:10 </a>
+     <button class="Notes"><a class="notes2" href="https://www.learncbse.in/cbse-class-11-notes/"> Class:11 </a>
+     <button class="Notes"><a class="notes2" href="https://www.learncbse.in/cbse-class-12-notes/"> Class:12 </a>
+     <button class="Notes"><a class="notes2" href="https://www.vedantu.com/jee-main/revision-notes"> JEE </a>
+    
+    
+    
+    
+    <script> 
+
+      const timedisplay = document.querySelector("#timedisplay");
+      const startBtn = document.querySelector("#startBtn");
+      const pauseBtn = document.querySelector("#stopBtn");
+      const resetBtn = document.querySelector("#resetBtn");
+      let startTime = 0;
+      let elapsedTime = 0;
+      let currentTime = 0 ;
+      let paused = true   ;
+      let intervalId  ;
+      let hours = 0;
+      let mins = 0;
+      let secs = 0;
+    
+
+      startBtn.addEventListener("click", () => {
+          if (paused){
+              paused = false;
+              startTime = Date.now() - elapsedTime;
+              intervalId = setInterval(updateTime, 75);
+          }
+      });
+
+      pauseBtn.addEventListener("click", () => {
+          paused = true;
+          clearInterval(intervalId);
+      });
+
+      resetBtn.addEventListener("click", () => {
+          paused = true;
+          clearInterval(intervalId);
+          elapsedTime = 0;
+          hours = 0;
+          mins = 0;
+          secs = 0;
+          timedisplay.textContent = '00:00:00';
+      });
+
+      function updateTime(){
+          elapsedTime = Date.now() - startTime;
+          secs = Math.floor((elapsedTime / 1000) % 60);
+          mins = Math.floor((elapsedTime / (1000 * 60)) % 60);
+          hours = Math.floor((elapsedTime / (1000 * 60 * 60)) % 60);
+          timedisplay.textContent = `${hours}:${mins}:${secs}`;
+      }
+
+    </script>
+    <!-- Stop watch code was written by us but  in the timedisplay part and resetbtn part we used AI help(co pilot) -->
+      <center>
+
+<button class="button9"><a href="index.html"> Home </a></button>
+</center>
+</body>
+</html>
