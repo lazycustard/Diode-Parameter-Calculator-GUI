@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diode Parameter Analyzer - Graph Maker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input[type="file"] {
+            cursor: pointer;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 20px 0;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 500px;
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-item {
+            background: var(--gray-100);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 2px;
+        }
+
+        .results-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+        }
+
+        .result-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .file-info {
+            background: var(--gray-100);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--gray-500);
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--dark);
+            word-break: break-all;
+        }
+
+        .reset-btn {
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .zoom-info {
+            background: var(--gray-100);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ Diode Parameter Analyzer</h1>
+            <p>Interactive Graph Maker with Advanced Customization</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #dbeafe; color: #3b82f6;">📄</div>
+                        <h2>Data Upload</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Upload CSV File</label>
+                            <input type="file" id="csvFile" accept=".csv">
+                        </div>
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <div class="file-name" id="fileName"></div>
+                            <div id="dataPoints"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #dcfce7; color: #10b981;">📊</div>
+                        <h2>Axis Range</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>X-Axis Range</label>
+                            <div class="input-row">
+                                <input type="number" id="xMin" placeholder="Min" value="-30">
+                                <input type="number" id="xMax" placeholder="Max" value="30">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Y-Axis Range</label>
+                            <div class="input-row">
+                                <input type="number" id="yMin" placeholder="Min" value="0">
+                                <input type="number" id="yMax" placeholder="Max" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Step Size</label>
+                            <div class="input-row">
+                                <input type="number" id="xStep" placeholder="X Step" value="5">
+                                <input type="number" id="yStep" placeholder="Y Step" value="10">
+                            </div>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="autoScale" checked>
+                            <label for="autoScale">Auto-scale Y axis</label>
+                        </div>
+                        <button class="btn btn-primary" id="applyRange" style="width: 100%; margin-top: 10px;">Apply Range</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #fef3c7; color: #f59e0b;">🔍</div>
+                        <h2>Zoom Controls</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="zoomIn">Zoom In</button>
+                            <button class="btn btn-secondary" id="zoomOut">Zoom Out</button>
+                        </div>
+                        <button class="btn btn-danger reset-btn" id="resetZoom">Reset Zoom</button>
+                        <div class="zoom-info">
+                            💡 Scroll to zoom • Drag to pan • Double-click to reset
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #fce7f3; color: #ec4899;">📈</div>
+                        <h2>Results</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="idealityValue">--</div>
+                                <div class="stat-label">Ideality (n)</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="saturationValue">--</div>
+                                <div class="stat-label">Is (A)</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="turnonValue">--</div>
+                                <div class="stat-label">Von (V)</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="pointsValue">--</div>
+                                <div class="stat-label">Data Points</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-area">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #e0e7ff; color: #6366f1;">📉</div>
+                        <h2>I-V Characteristic Curve</h2>
+                        <div style="margin-left: auto; display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" id="linearScale">Linear</button>
+                            <button class="btn btn-secondary" id="logScale">Log</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let chart = null;
+        let voltageData = [];
+        let currentData = [];
+        let isLogScale = true;
+
+        // CSV Parser for Keysight B1500A format
+        function parseCSV(fileContent) {
+            const lines = fileContent.split('\n');
+            const voltage = [];
+            const current = [];
+            
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('DataValue,')) {
+                    const parts = trimmed.split(',');
+                    if (parts.length >= 3) {
+                        try {
+                            voltage.push(parseFloat(parts[1]));
+                            current.push(parseFloat(parts[2]));
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                }
+            }
+            
+            return { voltage, current };
+        }
+
+        // Process data and calculate parameters
+        function calculateParameters(voltage, current) {
+            const k = 1.380649e-23;
+            const q = 1.602176634e-19;
+            const T = 300;
+            
+            // Filter forward bias (V > 0 and I > 0)
+            const forwardV = [];
+            const forwardI = [];
+            for (let i = 0; i < voltage.length; i++) {
+                if (voltage[i] > 0 && current[i] > 0) {
+                    forwardV.push(voltage[i]);
+                    forwardI.push(current[i]);
+                }
+            }
+            
+            if (forwardV.length < 2) {
+                return null;
+            }
+            
+            // Calculate ln(I) and linear fit
+            const lnI = forwardI.map(i => Math.log(i));
+            
+            // Simple linear regression
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            const n = forwardV.length;
+            for (let i = 0; i < n; i++) {
+                sumX += forwardV[i];
+                sumY += lnI[i];
+                sumXY += forwardV[i] * lnI[i];
+                sumX2 += forwardV[i] * forwardV[i];
+            }
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            const idealityFactor = (k * T / q) * slope;
+            const saturationCurrent = Math.exp(intercept);
+            
+            // Turn-on voltage (where I reaches 10% of max)
+            const maxI = Math.max(...forwardI);
+            const turnonVoltage = forwardV.find(v => 
+                forwardI[forwardV.indexOf(v)] > maxI * 0.1
+            ) || 0;
+            
+            return {
+                idealityFactor,
+                saturationCurrent,
+                turnonVoltage,
+                dataPoints: forwardV.length
+            };
+        }
+
+        // Create Chart
+        function createChart(voltage, current) {
+            const ctx = document.getElementById('chart').getContext('2d');
+            
+            const labels = voltage;
+            const dataPoints = current.map(i => Math.abs(i));
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Current (A)',
+                        data: dataPoints,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#3b82f6',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: parseFloat(document.getElementById('xMin').value) || 0,
+                            max: parseFloat(document.getElementById('xMax').value) || 30,
+                            title: {
+                                display: true,
+                                text: 'Voltage (V)',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        },
+                        y: {
+                            type: isLogScale ? 'logarithmic' : 'linear',
+                            title: {
+                                display: true,
+                                text: 'Current (A)',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        zoom: {
+                            zoom: {
+                                wheel: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                },
+                                mode: 'xy'
+                            },
+                            pan: {
+                                enabled: true,
+                                mode: 'xy'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // Update axis range
+        function updateAxisRange() {
+            if (!chart) return;
+            
+            const xMin = parseFloat(document.getElementById('xMin').value);
+            const xMax = parseFloat(document.getElementById('xMax').value);
+            const yMin = parseFloat(document.getElementById('yMin').value);
+            const yMax = parseFloat(document.getElementById('yMax').value);
+            const autoScale = document.getElementById('autoScale').checked;
+            
+            chart.options.scales.x.min = xMin;
+            chart.options.scales.x.max = xMax;
+            
+            if (!autoScale) {
+                chart.options.scales.y.min = yMin;
+                chart.options.scales.y.max = yMax;
+            } else {
+                delete chart.options.scales.y.min;
+                delete chart.options.scales.y.max;
+            }
+            
+            chart.update();
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Event Listeners
+        document.getElementById('csvFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const { voltage, current } = parseCSV(event.target.result);
+                    
+                    if (voltage.length === 0) {
+                        showToast('No data found in CSV');
+                        return;
+                    }
+                    
+                    voltageData = voltage;
+                    currentData = current;
+                    
+                    document.getElementById('fileInfo').style.display = 'block';
+                    document.getElementById('fileName').textContent = file.name;
+                    document.getElementById('dataPoints').textContent = `${voltage.length} data points`;
+                    
+                    // Auto-set Y range
+                    const maxCurrent = Math.max(...current.map(c => Math.abs(c)));
+                    const yMax = Math.ceil(maxCurrent * 1.2 / Math.pow(10, Math.floor(Math.log10(maxCurrent)))) * Math.pow(10, Math.floor(Math.log10(maxCurrent)));
+                    document.getElementById('yMax').value = yMax.toExponential(2);
+                    document.getElementById('yMin').value = '1e-12';
+                    
+                    createChart(voltage, current);
+                    
+                    // Calculate parameters
+                    const params = calculateParameters(voltage, current);
+                    if (params) {
+                        document.getElementById('idealityValue').textContent = params.idealityFactor.toFixed(4);
+                        document.getElementById('saturationValue').textContent = params.saturationCurrent.toExponential(2);
+                        document.getElementById('turnonValue').textContent = params.turnonVoltage.toFixed(3);
+                        document.getElementById('pointsValue').textContent = params.dataPoints;
+                    }
+                    
+                    showToast('File loaded successfully!');
+                } catch (error) {
+                    showToast('Error parsing file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('applyRange').addEventListener('click', () => {
+            updateAxisRange();
+            showToast('Axis range updated!');
+        });
+
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            if (chart) {
+                chart.zoom(1.2);
+            }
+        });
+
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            if (chart) {
+                chart.zoom(0.8);
+            }
+        });
+
+        document.getElementById('resetZoom').addEventListener('click', () => {
+            if (chart) {
+                chart.resetZoom();
+                showToast('Zoom reset!');
+            }
+        });
+
+        document.getElementById('linearScale').addEventListener('click', () => {
+            if (chart) {
+                isLogScale = false;
+                chart.options.scales.y.type = 'linear';
+                chart.update();
+            }
+        });
+
+        document.getElementById('logScale').addEventListener('click', () => {
+            if (chart) {
+                isLogScale = true;
+                chart.options.scales.y.type = 'logarithmic';
+                chart.update();
+            }
+        });
+
+        // Initialize with empty chart
+        const ctx = document.getElementById('chart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Current (A)',
+                    data: [],
+                    borderColor: '#3b82f6',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        min: -30,
+                        max: 30,
+                        title: {
+                            display: true,
+                            text: 'Voltage (V)'
+                        }
+                    },
+                    y: {
+                        type: 'logarithmic',
+                        title: {
+                            display: true,
+                            text: 'Current (A)'
+                        }
+                    }
+                },
+                plugins: {
+                    zoom: {
+                        zoom: {
+                            wheel: { enabled: true },
+                            pinch: { enabled: true },
+                            mode: 'xy'
+                        },
+                        pan: {
+                            enabled: true,
+                            mode: 'xy'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
